@@ -31,21 +31,34 @@ public class CLWindows extends CommandLine {
 
     @Override
     public ProcessBuilder getBuilderStartHLAE(String hlaePath, String gamePath) {
-        Path hl2Path = Paths.get(gamePath).resolve(".." + File.separator + "tf_win64.exe");
-        try {
-            hl2Path = hl2Path.toRealPath();
-        } catch (IOException e) {
-            log.warning("Could not obtain real path of game executable: " + e.toString());
-        }
-        Path hookPath = Paths.get(hlaePath).resolveSibling("AfxHookSource.dll");
-        try {
-            hookPath = hookPath.toRealPath();
-        } catch (IOException e) {
-            log.warning("Could not obtain real path of HLAE Source hook DLL: " + e.toString());
-        }
-        return new ProcessBuilder(hlaePath, "-customLoader", "-autoStart",
-            "-hookDllPath", hookPath.toString(), "-programPath", hl2Path.toString(), "-cmdLine");
+    Path hl2Path = Paths.get(gamePath)
+            .resolve(".." + File.separator + "tf_win64.exe");
+    try {
+        hl2Path = hl2Path.toRealPath();
+    } catch (IOException e) {
+        log.warning("Could not obtain real path of game executable: " + e);
     }
+
+    Path hookPath = Paths.get(hlaePath)
+            .getParent()
+            .resolve("x64")
+            .resolve("AfxHookSource.dll");
+
+    try {
+        hookPath = hookPath.toRealPath();
+    } catch (IOException e) {
+        log.warning("Could not obtain real path of HLAE Source hook DLL: " + e);
+    }
+
+    return new ProcessBuilder(
+            hlaePath,
+            "-customLoader",
+            "-autoStart",
+            "-hookDllPath", hookPath.toString(),
+            "-programPath", hl2Path.toString(),
+            "-cmdLine"
+    );
+}
 
     @Override
     public ProcessBuilder getBuilderTF2ProcessKiller() {
